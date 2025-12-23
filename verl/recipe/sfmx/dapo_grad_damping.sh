@@ -61,8 +61,8 @@ val_top_p=0.7
 # Performance Related Parameter
 sp_size=$NGPUS_PER_NODE
 use_dynamic_bsz=True
-actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1))
-infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1))
+actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
+infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 offload=False
 gen_tp=$NGPUS_PER_NODE
 fsdp_size=32
@@ -115,7 +115,7 @@ python3 -m verl.trainer.sfmx_grad_damping \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.enable_chunked_prefill=True \
-    actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length + max_response_length)) \
+    actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length + max_response_length)*4) \
     actor_rollout_ref.rollout.temperature=${temperature} \
     actor_rollout_ref.rollout.top_p=${top_p} \
     actor_rollout_ref.rollout.top_k=${top_k} \

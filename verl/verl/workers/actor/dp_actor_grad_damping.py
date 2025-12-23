@@ -71,36 +71,79 @@ class DampedLogProb(torch.autograd.Function):
         log_probs, labels = ctx.saved_tensors
         gamma = ctx.gamma
         
-        probs = torch.exp(log_probs)
-        grad_output_expanded = grad_output.unsqueeze(-1) # (N, 1)
+        # Original implementation (OOM prone)
+        # probs = torch.exp(log_probs)
+        # grad_output_expanded = grad_output.unsqueeze(-1) # (N, 1)
+        # 
+        # # Standard gradient for logits (unsampled): - p_j * g
+        # grad_logits = - probs * grad_output_expanded
+        # 
+        # # Calculate damping factor
+        # # We use p_theta as a proxy for p_ref
+        # # factor = (1 - p(j)/p(top))^gamma
+        # 
+        # probs_max, _ = probs.max(dim=-1, keepdim=True) # (N, 1)
+        # ratio = probs / (probs_max + 1e-8)
+        # damping_factor = (1 - ratio).pow(gamma)
+        # 
+        # # Apply damping to all tokens first
+        # grad_logits_damped = grad_logits * damping_factor
+        # 
+        # # Restore the gradient for the sampled token (labels)
+        # # We do NOT want to damp the sampled token, or at least we want to ensure
+        # # the positive component (1 * g) is added correctly and the negative component (-p*g) 
+        # # is consistent with the user's intent.
+        # # User: "I no longer truncate positive samples" -> implies standard handling for sampled token.
+        # # So we revert the sampled token gradient to the standard 'grad_logits' value (before damping)
+        # 
+        # grad_logits_damped.scatter_(-1, labels.unsqueeze(-1), grad_logits.gather(-1, labels.unsqueeze(-1)))
+        # 
+        # # Add the gradient component from the sampled index itself: + g
+        # # (Standard gradient is g - p*g. We have -p*g (restored above). Now add g.)
+        # grad_logits_damped.scatter_add_(-1, labels.unsqueeze(-1), grad_output_expanded)
+        # 
+        # return grad_logits_damped, None, None
+
+        # Use chunking to reduce memory usage
+        N, V = log_probs.shape
+        grad_logits_damped = torch.empty_like(log_probs)
         
-        # Standard gradient for logits (unsampled): - p_j * g
-        grad_logits = - probs * grad_output_expanded
+        chunk_size = 1024 
         
-        # Calculate damping factor
-        # We use p_theta as a proxy for p_ref
-        # factor = (1 - p(j)/p(top))^gamma
-        
-        probs_max, _ = probs.max(dim=-1, keepdim=True) # (N, 1)
-        ratio = probs / (probs_max + 1e-8)
-        damping_factor = (1 - ratio).pow(gamma)
-        
-        # Apply damping to all tokens first
-        grad_logits_damped = grad_logits * damping_factor
-        
-        # Restore the gradient for the sampled token (labels)
-        # We do NOT want to damp the sampled token, or at least we want to ensure
-        # the positive component (1 * g) is added correctly and the negative component (-p*g) 
-        # is consistent with the user's intent.
-        # User: "I no longer truncate positive samples" -> implies standard handling for sampled token.
-        # So we revert the sampled token gradient to the standard 'grad_logits' value (before damping)
-        
-        grad_logits_damped.scatter_(-1, labels.unsqueeze(-1), grad_logits.gather(-1, labels.unsqueeze(-1)))
-        
-        # Add the gradient component from the sampled index itself: + g
-        # (Standard gradient is g - p*g. We have -p*g (restored above). Now add g.)
-        grad_logits_damped.scatter_add_(-1, labels.unsqueeze(-1), grad_output_expanded)
-        
+        for i in range(0, N, chunk_size):
+            end = min(i + chunk_size, N)
+            
+            # Slice inputs for the current chunk
+            log_probs_chunk = log_probs[i:end]
+            labels_chunk = labels[i:end]
+            grad_output_chunk = grad_output[i:end]
+            
+            # Recompute probs for chunk
+            probs_chunk = torch.exp(log_probs_chunk)
+            grad_output_expanded_chunk = grad_output_chunk.unsqueeze(-1) # (chunk_size, 1)
+            
+            # Standard gradient for logits (unsampled): - p_j * g
+            grad_logits_chunk = - probs_chunk * grad_output_expanded_chunk
+            
+            # Calculate damping factor for chunk
+            probs_max_chunk, _ = probs_chunk.max(dim=-1, keepdim=True) # (chunk_size, 1)
+            ratio_chunk = probs_chunk / (probs_max_chunk + 1e-8)
+            damping_factor_chunk = (1 - ratio_chunk).pow(gamma)
+            
+            # Apply damping
+            grad_logits_damped_chunk = grad_logits_chunk * damping_factor_chunk
+            
+            # Restore the gradient for the sampled token (labels)
+            # The target gradient for the label index is: g * (1 - p_label)
+            probs_at_labels = probs_chunk.gather(-1, labels_chunk.unsqueeze(-1))
+            target_grad_at_labels = grad_output_expanded_chunk * (1 - probs_at_labels)
+            
+            # Scatter the correct gradient back to the label indices
+            grad_logits_damped_chunk.scatter_(-1, labels_chunk.unsqueeze(-1), target_grad_at_labels)
+            
+            # Assign chunk to output
+            grad_logits_damped[i:end] = grad_logits_damped_chunk
+            
         return grad_logits_damped, None, None
 
 

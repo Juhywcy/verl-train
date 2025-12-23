@@ -59,13 +59,13 @@ top_k=-1 # 0 for HF rollout, -1 for vLLM rollout
 val_top_p=0.7
 
 # Performance Related Parameter
-sp_size=$NGPUS_PER_NODE
+sp_size=4
 use_dynamic_bsz=True
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 offload=True
 # gen_tp=$NGPUS_PER_NODE
-gen_tp=$NGPUS_PER_NODE
+gen_tp=4
 fsdp_size=32
 
 # Grad Damping Parameter

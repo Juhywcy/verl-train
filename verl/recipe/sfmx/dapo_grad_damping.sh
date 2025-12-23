@@ -64,7 +64,8 @@ use_dynamic_bsz=True
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 offload=False
-gen_tp=$NGPUS_PER_NODE
+# gen_tp=$NGPUS_PER_NODE
+gen_tp=1
 fsdp_size=32
 
 # Grad Damping Parameter
@@ -99,7 +100,7 @@ python3 -m verl.trainer.sfmx_grad_damping \
     actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=${infer_ppo_max_token_len} \
     actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=${infer_ppo_max_token_len} \
     actor_rollout_ref.model.path="${MODEL_PATH}" \
-    actor_rollout_ref.model.enable_gradient_checkpointing=False \
+    actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.actor.optim.lr_warmup_steps=10 \
     actor_rollout_ref.actor.optim.weight_decay=0.1 \

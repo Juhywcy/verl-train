@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# export CUDA_VISIBLE_DEVICES="0,1,2,3" 
+export CUDA_VISIBLE_DEVICES="0,1,2,3" 
 # export CUDA_VISIBLE_DEVICES="4,5,6,7" 
 # export CUDA_VISIBLE_DEVICES="4,5"
 # export CUDA_VISIBLE_DEVICES="6,7"
@@ -40,7 +40,7 @@ total_training_steps=100
 # WORKING_DIR=${WORKING_DIR:-"${PWD}"}
 # RUNTIME_ENV=${RUNTIME_ENV:-"${WORKING_DIR}/verl/trainer/runtime_env.yaml"}
 NNODES=${NNODES:-1}
-NGPUS_PER_NODE=${NGPUS_PER_NODE:-8}
+NGPUS_PER_NODE=${NGPUS_PER_NODE:-4}
 # Paths
 RAY_DATA_HOME=${RAY_DATA_HOME:-"${HOME}"}
 # very important! please modify the max_position_embeddings in config.json to 32768 after downloading from huggingface

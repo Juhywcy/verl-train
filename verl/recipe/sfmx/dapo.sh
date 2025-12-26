@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-export CUDA_VISIBLE_DEVICES="0,1,2,3" 
-# export CUDA_VISIBLE_DEVICES="4,5,6,7" 
+# export CUDA_VISIBLE_DEVICES="0,1,2,3" 
+export CUDA_VISIBLE_DEVICES="4,5,6,7" 
 # export CUDA_VISIBLE_DEVICES="4,5"
 # export RAY_DEBUG_POST_MORTEM=1
 set -xeuo pipefail
 
 project_name='DAPO'
-exp_name='DAPO-deepseek-Qwen1.5B-200step'
+exp_name='DAPO-deepseek-Qwen1.5B-100step'
 
 adv_estimator=grpo
 adv_isreward=False
@@ -20,7 +20,7 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 1))
-max_response_length=$((1024 * 10))
+max_response_length=$((1024 * 16))
 enable_overlong_buffer=False
 overlong_buffer_len=$((1024 * 4))
 overlong_penalty_factor=1.0
@@ -29,7 +29,7 @@ loss_agg_mode="token-mean"
 
 train_prompt_bsz=32
 train_prompt_mini_bsz=8
-train_prompt_micro_bsz=4 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
+train_prompt_micro_bsz=1 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
 n_resp_per_prompt=8
 total_training_steps=100
 

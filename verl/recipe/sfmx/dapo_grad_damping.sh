@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # export CUDA_VISIBLE_DEVICES="0,1,2,3" 
-export CUDA_VISIBLE_DEVICES="2,3,4,5" 
-# export CUDA_VISIBLE_DEVICES="4,5,6,7" 
+# export CUDA_VISIBLE_DEVICES="2,3,4,5" 
+export CUDA_VISIBLE_DEVICES="4,5,6,7" 
 # export CUDA_VISIBLE_DEVICES="4,5"
 # export CUDA_VISIBLE_DEVICES="6,7"
 # export RAY_DEBUG_POST_MORTEM=1
@@ -34,7 +34,7 @@ train_prompt_bsz=32
 train_prompt_mini_bsz=8
 train_prompt_micro_bsz=1 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
 n_resp_per_prompt=8
-total_training_steps=100
+total_training_steps=200
 
 # Ray
 # RAY_ADDRESS=${RAY_ADDRESS:-"http://localhost:8265"}

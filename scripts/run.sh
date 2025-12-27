@@ -4,5 +4,5 @@
 # bash verl/recipe/sfmx/dapo.sh
 
 while true; do
-    bash verl/recipe/sfmx/dapo_grad_damping_eos.sh
+    bash scripts/wait.sh
 done

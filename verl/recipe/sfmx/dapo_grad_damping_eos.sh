@@ -138,9 +138,9 @@ python3 -m verl.trainer.sfmx_grad_damping \
     trainer.experiment_name="${exp_name}" \
     trainer.n_gpus_per_node="${NGPUS_PER_NODE}" \
     trainer.nnodes="${NNODES}" \
-    trainer.val_before_train=True \
+    trainer.val_before_train=False \
     trainer.test_freq=10 \
-    trainer.save_freq=${total_training_steps} \
+    trainer.save_freq=10 \
     trainer.total_epochs=10 \
     trainer.total_training_steps=${total_training_steps} \
     trainer.default_local_dir="${CKPTS_DIR}" \

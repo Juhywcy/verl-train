@@ -1,7 +1,7 @@
 #!/bin/bash
 
-GPU_IDS=(0 1 2 3)    
-# GPU_IDS=(4 5 6 7)            # 要监控的GPU编号（从0开始）
+# GPU_IDS=(0 1 2 3)    
+GPU_IDS=(4 5 6 7)            # 要监控的GPU编号（从0开始）
 THRESHOLD=1500           # 显存占用低于该值(MiB)时视为“空闲”
 SLEEP_INTERVAL=100      # 每隔几秒检查一次
 echo "监控 GPU $GPU_ID，显存小于 ${THRESHOLD} MiB 时自动启动程序..."
@@ -114,9 +114,9 @@ while true; do
         # bash verl/recipe/l2s/deepseek_qwen1.5B_total.sh
         # bash verl/recipe/l2s/deepseek_qwen1.5B_stage1_exp.sh
         # bash verl/recipe/l2s/deepseek_qwen7B_stage2-logic.sh
-        bash verl/recipe/sfmx/dapo_grad_trunc.sh 
+        # bash verl/recipe/sfmx/dapo_grad_trunc.sh 
         # bash verl/recipe/sfmx/dapo.sh
-        
+        bash verl/recipe/sfmx/dapo_grad_damping_eos.sh        
         break
     else
         echo "GPU $GPU_ID 当前显存 ${USED_MEM} MiB，大于等于阈值 ${THRESHOLD} MiB，等待中..."

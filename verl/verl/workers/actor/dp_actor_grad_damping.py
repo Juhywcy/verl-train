@@ -53,7 +53,7 @@ logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
 
 class DampedLogProb(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, logits, labels, gamma):
+    def forward(ctx, logits, labels, gamma, eos_token_id=None):
         # logits: (N, V)
         # labels: (N,)
         # gamma: float, damping coefficient
@@ -62,6 +62,7 @@ class DampedLogProb(torch.autograd.Function):
         
         ctx.save_for_backward(log_probs, labels)
         ctx.gamma = gamma
+        ctx.eos_token_id = eos_token_id
 
         return torch.gather(log_probs, -1, labels.unsqueeze(-1)).squeeze(-1)
 
@@ -70,6 +71,7 @@ class DampedLogProb(torch.autograd.Function):
     def backward(ctx, grad_output):
         log_probs, labels = ctx.saved_tensors
         gamma = ctx.gamma
+        eos_token_id = ctx.eos_token_id
         
         # Original implementation (OOM prone)
         # probs = torch.exp(log_probs)
@@ -133,6 +135,10 @@ class DampedLogProb(torch.autograd.Function):
             # Apply damping
             grad_logits_damped_chunk = grad_logits_chunk * damping_factor_chunk
             
+            # Restore the gradient for eos_token_id (if provided)
+            if eos_token_id is not None:
+                grad_logits_damped_chunk[:, eos_token_id] = grad_logits_chunk[:, eos_token_id]
+
             # Restore the gradient for the sampled token (labels)
             # The target gradient for the label index is: g * (1 - p_label)
             probs_at_labels = probs_chunk.gather(-1, labels_chunk.unsqueeze(-1))
@@ -164,6 +170,17 @@ class DataParallelPPOActorGradDamping(BasePPOActor):
         self.grad_damping_gamma = self.config.get("grad_damping_gamma", 0.0)
         if torch.distributed.get_rank() == 0:
             print(f"Using gradient damping with gamma {self.grad_damping_gamma}")
+
+        # Try to get eos_token_id from actor_module
+        self.eos_token_id = None
+        module_to_check = actor_module
+        if hasattr(module_to_check, "config"):
+             self.eos_token_id = getattr(module_to_check.config, "eos_token_id", None)
+        elif hasattr(module_to_check, "module") and hasattr(module_to_check.module, "config"):
+             self.eos_token_id = getattr(module_to_check.module.config, "eos_token_id", None)
+             
+        if torch.distributed.get_rank() == 0:
+            print(f"Actor eos_token_id={self.eos_token_id}")
 
         self.ulysses_sequence_parallel_size = self.config.ulysses_sequence_parallel_size
         self.use_ulysses_sp = self.ulysses_sequence_parallel_size > 1
@@ -376,7 +393,7 @@ class DataParallelPPOActorGradDamping(BasePPOActor):
                         logits_flat = logits.reshape(-1, V)
                         labels_flat = micro_batch["responses"].reshape(-1)
                         
-                        log_probs = DampedLogProb.apply(logits_flat, labels_flat, self.grad_damping_gamma)
+                        log_probs = DampedLogProb.apply(logits_flat, labels_flat, self.grad_damping_gamma, self.eos_token_id)
                         log_probs = log_probs.view(B, L)
                     else:
                         log_probs = logprobs_from_logits(logits, micro_batch["responses"])

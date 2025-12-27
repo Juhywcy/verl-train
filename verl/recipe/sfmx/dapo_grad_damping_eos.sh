@@ -31,7 +31,7 @@ loss_agg_mode="token-mean"
 
 train_prompt_bsz=32
 train_prompt_mini_bsz=8
-train_prompt_micro_bsz=1 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
+train_prompt_micro_bsz=4 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
 n_resp_per_prompt=8
 total_training_steps=100
 

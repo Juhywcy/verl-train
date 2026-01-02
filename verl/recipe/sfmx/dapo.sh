@@ -6,7 +6,7 @@ export CUDA_VISIBLE_DEVICES="4,5,6,7"
 set -xeuo pipefail
 
 project_name='DAPO'
-exp_name='DAPO-deepseek-Qwen1.5B-100step'
+exp_name='DAPO-deepseek-Qwen1.5B-300step'
 
 adv_estimator=grpo
 adv_isreward=False

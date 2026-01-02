@@ -8,7 +8,7 @@ export CUDA_LAUNCH_BLOCKING=1
 set -xeuo pipefail
 
 project_name='DAPO'
-exp_name='DAPO-deepseek-Qwen1.5B-100step-grad-damping-eos'
+exp_name='DAPO-deepseek-Qwen1.5B-300step-grad-damping-eos'
 
 adv_estimator=grpo
 adv_isreward=False
@@ -33,7 +33,7 @@ train_prompt_bsz=32
 train_prompt_mini_bsz=8
 train_prompt_micro_bsz=4 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
 n_resp_per_prompt=8
-total_training_steps=100
+total_training_steps=300
 
 # Ray
 # RAY_ADDRESS=${RAY_ADDRESS:-"http://localhost:8265"}

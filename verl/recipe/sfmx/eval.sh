@@ -31,7 +31,7 @@ train_prompt_bsz=32
 train_prompt_mini_bsz=8
 train_prompt_micro_bsz=4 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
 n_resp_per_prompt=8
-total_training_steps=100
+total_training_steps=0
 
 # Ray
 # RAY_ADDRESS=${RAY_ADDRESS:-"http://localhost:8265"}

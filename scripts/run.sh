@@ -7,11 +7,14 @@
 #     bash scripts/wait.sh
 # done
 
-while true; do
-    val=$(cat ckpts/DAPO/DAPO-deepseek-Qwen1.5B-100step-grad-damping-eos/latest_checkpointed_iteration.txt)
-    if [ "$val" -eq 300 ]; then
-        echo "Value is 300. Stopping."
-        break
-    fi
-    bash scripts/wait.sh
-done
+# while true; do
+#     val=$(cat ckpts/DAPO/DAPO-deepseek-Qwen1.5B-100step-grad-damping-eos/latest_checkpointed_iteration.txt)
+#     if [ "$val" -eq 300 ]; then
+#         echo "Value is 300. Stopping."
+#         break
+#     fi
+#     bash scripts/wait.sh
+# done
+
+
+bash verl/recipe/sfmx/eval.sh  

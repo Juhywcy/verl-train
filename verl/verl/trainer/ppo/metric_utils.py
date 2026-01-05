@@ -403,7 +403,7 @@ def process_validation_metrics(
                     metric[f"std@{n_resps}"] = np.std(var_vals)
 
                     ns = []
-                    n = 2
+                    n = 1
                     while n < n_resps:
                         ns.append(n)
                         n *= 2

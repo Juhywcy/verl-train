@@ -53,14 +53,15 @@ logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
 
 class DampedLogProb(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, logits, labels, gamma, eos_token_id=None):
+    def forward(ctx, logits, labels, gamma, damping_mask=None, eos_token_id=None):
         # logits: (N, V)
         # labels: (N,)
         # gamma: float, damping coefficient
+        # damping_mask: (N,) bool, True means apply damping
         
         log_probs = torch.nn.functional.log_softmax(logits, dim=-1)
         
-        ctx.save_for_backward(log_probs, labels)
+        ctx.save_for_backward(log_probs, labels, damping_mask)
         ctx.gamma = gamma
         ctx.eos_token_id = eos_token_id
 
@@ -69,43 +70,10 @@ class DampedLogProb(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_output):
-        log_probs, labels = ctx.saved_tensors
+        log_probs, labels, damping_mask = ctx.saved_tensors
         gamma = ctx.gamma
         eos_token_id = ctx.eos_token_id
         
-        # Original implementation (OOM prone)
-        # probs = torch.exp(log_probs)
-        # grad_output_expanded = grad_output.unsqueeze(-1) # (N, 1)
-        # 
-        # # Standard gradient for logits (unsampled): - p_j * g
-        # grad_logits = - probs * grad_output_expanded
-        # 
-        # # Calculate damping factor
-        # # We use p_theta as a proxy for p_ref
-        # # factor = (1 - p(j)/p(top))^gamma
-        # 
-        # probs_max, _ = probs.max(dim=-1, keepdim=True) # (N, 1)
-        # ratio = probs / (probs_max + 1e-8)
-        # damping_factor = (1 - ratio).pow(gamma)
-        # 
-        # # Apply damping to all tokens first
-        # grad_logits_damped = grad_logits * damping_factor
-        # 
-        # # Restore the gradient for the sampled token (labels)
-        # # We do NOT want to damp the sampled token, or at least we want to ensure
-        # # the positive component (1 * g) is added correctly and the negative component (-p*g) 
-        # # is consistent with the user's intent.
-        # # User: "I no longer truncate positive samples" -> implies standard handling for sampled token.
-        # # So we revert the sampled token gradient to the standard 'grad_logits' value (before damping)
-        # 
-        # grad_logits_damped.scatter_(-1, labels.unsqueeze(-1), grad_logits.gather(-1, labels.unsqueeze(-1)))
-        # 
-        # # Add the gradient component from the sampled index itself: + g
-        # # (Standard gradient is g - p*g. We have -p*g (restored above). Now add g.)
-        # grad_logits_damped.scatter_add_(-1, labels.unsqueeze(-1), grad_output_expanded)
-        # 
-        # return grad_logits_damped, None, None
-
         # Use chunking to reduce memory usage
         N, V = log_probs.shape
         grad_logits_damped = torch.empty_like(log_probs)
@@ -132,6 +100,10 @@ class DampedLogProb(torch.autograd.Function):
             ratio_chunk = probs_chunk / (probs_max_chunk + 1e-8)
             damping_factor_chunk = (1 - ratio_chunk).pow(gamma)
             
+            if damping_mask is not None:
+                mask_chunk = damping_mask[i:end].unsqueeze(-1)
+                damping_factor_chunk = torch.where(mask_chunk, damping_factor_chunk, torch.ones_like(damping_factor_chunk))
+            
             # Apply damping
             grad_logits_damped_chunk = grad_logits_chunk * damping_factor_chunk
             
@@ -150,7 +122,7 @@ class DampedLogProb(torch.autograd.Function):
             # Assign chunk to output
             grad_logits_damped[i:end] = grad_logits_damped_chunk
             
-        return grad_logits_damped, None, None
+        return grad_logits_damped, None, None, None, None
 
 
 class DataParallelPPOActorGradDamping(BasePPOActor):
@@ -308,7 +280,22 @@ class DataParallelPPOActorGradDamping(BasePPOActor):
                         inplace_backward = False
                     
                     if self.grad_damping_gamma > 0.0:
-                        log_probs = DampedLogProb.apply(logits_rmpad, input_ids_rmpad_rolled, self.grad_damping_gamma)
+                        damping_mask_rmpad = None
+                        if "damping_mask" in micro_batch:
+                            damping_mask = micro_batch["damping_mask"]
+                            damping_mask_rmpad = index_first_axis(
+                                rearrange(damping_mask.unsqueeze(-1), "b s ... -> (b s) ..."), indices
+                            ).transpose(0, 1).squeeze(0).squeeze(-1)
+                            
+                            if self.use_ulysses_sp:
+                                damping_mask_rmpad, _, _ = ulysses_pad_and_slice_inputs(
+                                    damping_mask_rmpad.unsqueeze(0),
+                                    position_ids_rmpad=None,
+                                    sp_size=self.ulysses_sequence_parallel_size,
+                                )
+                                damping_mask_rmpad = damping_mask_rmpad.squeeze(0)
+                        
+                        log_probs = DampedLogProb.apply(logits_rmpad, input_ids_rmpad_rolled, self.grad_damping_gamma, damping_mask_rmpad, self.eos_token_id)
                     else:
                         log_probs = logprobs_from_logits(
                             logits=logits_rmpad,
@@ -393,7 +380,14 @@ class DataParallelPPOActorGradDamping(BasePPOActor):
                         logits_flat = logits.reshape(-1, V)
                         labels_flat = micro_batch["responses"].reshape(-1)
                         
-                        log_probs = DampedLogProb.apply(logits_flat, labels_flat, self.grad_damping_gamma, self.eos_token_id)
+                        damping_mask_flat = None
+                        if "damping_mask" in micro_batch:
+                             ResponseLen = logits.shape[1]
+                             PromptLen = micro_batch["input_ids"].shape[1] - ResponseLen
+                             damping_mask = micro_batch["damping_mask"][:, PromptLen:]
+                             damping_mask_flat = damping_mask.reshape(-1)
+                        
+                        log_probs = DampedLogProb.apply(logits_flat, labels_flat, self.grad_damping_gamma, damping_mask_flat, self.eos_token_id)
                         log_probs = log_probs.view(B, L)
                     else:
                         log_probs = logprobs_from_logits(logits, micro_batch["responses"])
@@ -511,6 +505,7 @@ class DataParallelPPOActorGradDamping(BasePPOActor):
             "position_ids",
             "old_log_probs",
             "advantages",
+            "token_level_scores",
         ]
         if self.config.use_kl_loss:
             select_keys.append("ref_log_prob")
@@ -589,6 +584,24 @@ class DataParallelPPOActorGradDamping(BasePPOActor):
                     response_mask = data["response_mask"]
                     old_log_prob = data["old_log_probs"]
                     advantages = data["advantages"]
+
+                    # Compute damping mask
+                    if "token_level_scores" in data:
+                        rewards = data["token_level_scores"]
+                        if rewards.dim() == 2:
+                            seq_score = rewards.sum(dim=-1)
+                        else:
+                            seq_score = rewards
+                        is_positive = seq_score > 0
+                        
+                        input_ids = data["input_ids"]
+                        B, SeqLen = input_ids.shape
+                        ResponseLen = data["responses"].shape[-1]
+                        PromptLen = SeqLen - ResponseLen
+                        
+                        damping_mask = torch.zeros((B, SeqLen), dtype=torch.bool, device=input_ids.device)
+                        damping_mask[:, PromptLen:] = is_positive.unsqueeze(-1).expand(B, ResponseLen)
+                        data["damping_mask"] = damping_mask
 
                     clip_ratio = self.config.clip_ratio
                     clip_ratio_low = (

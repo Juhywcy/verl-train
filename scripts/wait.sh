@@ -116,7 +116,7 @@ while true; do
         # bash verl/recipe/l2s/deepseek_qwen7B_stage2-logic.sh
         # bash verl/recipe/sfmx/dapo_grad_trunc.sh 
         # bash verl/recipe/sfmx/dapo.sh
-        bash verl/recipe/sfmx/dapo_grad_damping_eos.sh        
+        bash verl/recipe/sfmx/dapo_qwen4b.sh        
         break
     else
         echo "GPU $GPU_ID 当前显存 ${USED_MEM} MiB，大于等于阈值 ${THRESHOLD} MiB，等待中..."

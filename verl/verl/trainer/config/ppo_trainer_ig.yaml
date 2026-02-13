@@ -1,0 +1,40 @@
+# Format checks enforced on CI:
+# 1. Comments must appear above each field.
+# 2. There must be a blank line between each field.
+# 3. Inline comments (after a field on the same line) are not allowed.
+# 4. Indentation level is respected for nested fields.
+
+defaults:
+
+  # Load the baseline PPO trainer config.
+  - ppo_trainer
+
+  # Allow overrides in this file.
+  - _self_
+
+# config for the algorithm
+algorithm:
+
+  # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs in the entrypoint
+  _target_: verl.trainer.config.algorithm_ig.AlgoConfig
+
+  # Advantage estimator type: "gae", "grpo", "reinforce_plus_plus", etc.
+  adv_estimator: grpo
+
+  # GRPO weighting configuration
+  grpo_weighting:
+
+    # Whether to enable GRPO reweighting
+    enable: True
+
+    # Sigmoid sensitivity for entropy gating
+    beta: 1.0
+
+    # Clamp for standardized entropy
+    entropy_clip: 5.0
+
+    # Numerical stability term
+    eps: 1e-6
+
+    # Threshold to binarize correctness from score
+    correct_threshold: 0.5

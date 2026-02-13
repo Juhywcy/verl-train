@@ -149,7 +149,7 @@ python3 -m verl.trainer.l2s_stage2_ig \
     trainer.experiment_name="${exp_name}" \
     trainer.n_gpus_per_node="${NGPUS_PER_NODE}" \
     trainer.nnodes="${NNODES}" \
-    trainer.val_before_train=True \
+    trainer.val_before_train=False \
     trainer.test_freq=10 \
     trainer.save_freq=${total_training_steps} \
     trainer.total_epochs=10 \

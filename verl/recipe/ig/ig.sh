@@ -71,7 +71,7 @@ actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1))
 offload=True
 # gen_tp=$NGPUS_PER_NODE
-gen_tp=1
+gen_tp=4
 fsdp_size=32
 
 # Grad Damping Parameter

@@ -35,7 +35,7 @@ grpo_weight_entropy_clip=5.0
 grpo_weight_eps=1e-6
 grpo_weight_correct_threshold=0.5
 
-train_prompt_bsz=32
+train_prompt_bsz=64
 train_prompt_mini_bsz=8
 train_prompt_micro_bsz=1 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
 n_resp_per_prompt=8
@@ -65,7 +65,7 @@ top_k=-1 # 0 for HF rollout, -1 for vLLM rollout
 val_top_p=0.7
 
 # Performance Related Parameter
-sp_size=4
+sp_size=1
 use_dynamic_bsz=True
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1))

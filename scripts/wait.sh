@@ -2,7 +2,7 @@
 
 # GPU_IDS=(0 1 2 3)    
 GPU_IDS=(4 5 6 7)            # 要监控的GPU编号（从0开始）
-THRESHOLD=1000           # 显存占用低于该值(MiB)时视为“空闲”
+THRESHOLD=1500           # 显存占用低于该值(MiB)时视为“空闲”
 SLEEP_INTERVAL=100      # 每隔几秒检查一次
 echo "监控 GPU $GPU_ID，显存小于 ${THRESHOLD} MiB 时自动启动程序..."
 

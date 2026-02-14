@@ -51,6 +51,9 @@ def _apply_grpo_weighting(data, config):
     return data
 
 
+original_compute_advantage = base_ray_trainer.compute_advantage
+
+
 def compute_advantage(
     data,
     adv_estimator: AdvantageEstimator,
@@ -60,7 +63,7 @@ def compute_advantage(
     norm_adv_by_std_in_grpo: bool = True,
     config=None,
 ):
-    data = base_ray_trainer.compute_advantage(
+    data = original_compute_advantage(
         data=data,
         adv_estimator=adv_estimator,
         gamma=gamma,

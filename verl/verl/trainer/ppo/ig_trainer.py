@@ -51,7 +51,11 @@ def _apply_grpo_weighting(data, config):
     return data
 
 
-original_compute_advantage = base_ray_trainer.compute_advantage
+# Safe Monkey Patching
+if not hasattr(base_ray_trainer, "_original_compute_advantage"):
+    base_ray_trainer._original_compute_advantage = base_ray_trainer.compute_advantage
+
+original_compute_advantage = base_ray_trainer._original_compute_advantage
 
 
 def compute_advantage(

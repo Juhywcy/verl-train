@@ -74,6 +74,7 @@ def compute_advantage(
     )
     if adv_estimator == AdvantageEstimator.GRPO:
         data = _apply_grpo_weighting(data, config)
+    print("Advantages after GRPO weighting:")
     return data
 
 

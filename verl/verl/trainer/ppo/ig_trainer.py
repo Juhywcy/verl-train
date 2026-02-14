@@ -51,14 +51,12 @@ def _apply_grpo_weighting(data, config):
     return data
 
 
-# Safe Monkey Patching
-if not hasattr(base_ray_trainer, "_original_compute_advantage"):
-    base_ray_trainer._original_compute_advantage = base_ray_trainer.compute_advantage
+if not hasattr(base_ray_trainer, "_verl_ig_original_compute_advantage"):
+    base_ray_trainer._verl_ig_original_compute_advantage = base_ray_trainer.compute_advantage
 
-original_compute_advantage = base_ray_trainer._original_compute_advantage
+_real_original_compute_advantage = base_ray_trainer._verl_ig_original_compute_advantage
 
-
-def compute_advantage(
+def compute_advantage_wrapper(
     data,
     adv_estimator: AdvantageEstimator,
     gamma: float = 1.0,
@@ -67,7 +65,8 @@ def compute_advantage(
     norm_adv_by_std_in_grpo: bool = True,
     config=None,
 ):
-    data = original_compute_advantage(
+    print("Advantages before GRPO weighting:")
+    data = _real_original_compute_advantage(
         data=data,
         adv_estimator=adv_estimator,
         gamma=gamma,
@@ -82,7 +81,7 @@ def compute_advantage(
     return data
 
 
-base_ray_trainer.compute_advantage = compute_advantage
+base_ray_trainer.compute_advantage = compute_advantage_wrapper
 
 
 class RayPPOTrainer(base_ray_trainer.RayPPOTrainer):

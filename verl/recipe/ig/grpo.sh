@@ -9,7 +9,7 @@ export CUDA_LAUNCH_BLOCKING=1
 set -xeuo pipefail
 
 project_name='IG'
-exp_name='IG-deepseek-Qwen1.5B'
+exp_name='grpo-deepseek-Qwen1.5B'
 
 adv_estimator=grpo
 

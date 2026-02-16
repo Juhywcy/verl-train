@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-export CUDA_VISIBLE_DEVICES="0,1,2,3" 
-# export CUDA_VISIBLE_DEVICES="4,5,6,7" 
+# export CUDA_VISIBLE_DEVICES="0,1,2,3" 
+export CUDA_VISIBLE_DEVICES="4,5,6,7" 
 # export CUDA_VISIBLE_DEVICES="4,5"
 # export RAY_DEBUG_POST_MORTEM=1
 set -xeuo pipefail
@@ -30,8 +30,8 @@ loss_agg_mode="token-mean"
 train_prompt_bsz=64
 train_prompt_mini_bsz=16
 train_prompt_micro_bsz=4
-n_resp_per_prompt=4
-total_training_steps=400
+n_resp_per_prompt=8
+total_training_steps=200
 
 # Ray
 # RAY_ADDRESS=${RAY_ADDRESS:-"http://localhost:8265"}
@@ -42,7 +42,7 @@ NGPUS_PER_NODE=${NGPUS_PER_NODE:-4}
 # Paths
 RAY_DATA_HOME=${RAY_DATA_HOME:-"${HOME}"}
 # very important! please modify the max_position_embeddings in config.json to 32768 after downloading from huggingface
-MODEL_PATH=${MODEL_PATH:-"/home/hrzhu/model/Qwen3-4B"}
+MODEL_PATH=${MODEL_PATH:-"/home/models/Qwen/Qwen3-4B"}
 WORKING_DIR=${WORKING_DIR:-"${PWD}"}
 CKPTS_DIR=${CKPTS_DIR:-"${WORKING_DIR}/ckpts/${project_name}/${exp_name}"}
 # TRAIN_FILE=${TRAIN_FILE:-"${RAY_DATA_HOME}/dataset/DAPO-Math-17k/data/dapo-math-17k.parquet"}

@@ -6,7 +6,7 @@ export CUDA_VISIBLE_DEVICES="0,1,2,3"
 set -xeuo pipefail
 
 project_name='DAPO'
-exp_name='DAPO-Qwen3-4B-vanilla'
+exp_name='DAPO-Qwen3-4B-from50-stage2-16384'
 
 adv_estimator=grpo
 adv_isreward=False
@@ -29,7 +29,7 @@ loss_agg_mode="token-mean"
 
 train_prompt_bsz=64
 train_prompt_mini_bsz=16
-train_prompt_micro_bsz=4 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
+train_prompt_micro_bsz=1 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
 n_resp_per_prompt=4
 total_training_steps=400
 
@@ -44,7 +44,7 @@ RAY_DATA_HOME=${RAY_DATA_HOME:-"${HOME}"}
 # very important! please modify the max_position_embeddings in config.json to 32768 after downloading from huggingface
 # MODEL_PATH=${MODEL_PATH:-"${RAY_DATA_HOME}/model/DeepSeek-R1-Distill-Qwen-1.5B"}
 WORKING_DIR=${WORKING_DIR:-"${PWD}"}
-MODEL_PATH=${MODEL_PATH:-"/root/models/Qwen/Qwen3-4B"}
+MODEL_PATH=${MODEL_PATH:-"${WORKING_DIR}/ckpts/DAPO/DAPO-Qwen3-4B/global_step_50/actor_hf"}
 CKPTS_DIR=${CKPTS_DIR:-"${WORKING_DIR}/ckpts/${project_name}/${exp_name}"}
 # TRAIN_FILE=${TRAIN_FILE:-"${RAY_DATA_HOME}/dataset/DAPO-Math-17k/data/dapo-math-17k.parquet"}
 # TEST_FILE=${TEST_FILE:-"${RAY_DATA_HOME}/dataset/DAPO-AIME-2024/data/aime-2024.parquet"}
@@ -133,8 +133,8 @@ python3 -m verl.trainer.l2s_stage2 \
     trainer.n_gpus_per_node="${NGPUS_PER_NODE}" \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
-    trainer.test_freq=50 \
-    trainer.save_freq=50 \
+    trainer.test_freq=20 \
+    trainer.save_freq=20 \
     trainer.total_epochs=10 \
     trainer.total_training_steps=${total_training_steps} \
     trainer.default_local_dir="${CKPTS_DIR}" \

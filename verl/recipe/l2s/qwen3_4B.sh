@@ -6,7 +6,7 @@ export CUDA_VISIBLE_DEVICES="0,1,2,3"
 set -xeuo pipefail
 
 project_name='DAPO'
-exp_name='DAPO-Qwen3-4B-from50-stage2-16384'
+exp_name='DAPO-Qwen3-4B-stage2-16384'
 
 adv_estimator=grpo
 adv_isreward=False
@@ -44,7 +44,7 @@ RAY_DATA_HOME=${RAY_DATA_HOME:-"${HOME}"}
 # very important! please modify the max_position_embeddings in config.json to 32768 after downloading from huggingface
 # MODEL_PATH=${MODEL_PATH:-"${RAY_DATA_HOME}/model/DeepSeek-R1-Distill-Qwen-1.5B"}
 WORKING_DIR=${WORKING_DIR:-"${PWD}"}
-MODEL_PATH=${MODEL_PATH:-"${WORKING_DIR}/ckpts/DAPO/DAPO-Qwen3-4B/global_step_50/actor_hf"}
+MODEL_PATH=${MODEL_PATH:-"/home/models/Qwen/Qwen3-4B"}
 CKPTS_DIR=${CKPTS_DIR:-"${WORKING_DIR}/ckpts/${project_name}/${exp_name}"}
 # TRAIN_FILE=${TRAIN_FILE:-"${RAY_DATA_HOME}/dataset/DAPO-Math-17k/data/dapo-math-17k.parquet"}
 # TEST_FILE=${TEST_FILE:-"${RAY_DATA_HOME}/dataset/DAPO-AIME-2024/data/aime-2024.parquet"}

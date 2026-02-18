@@ -27,7 +27,7 @@ while true; do
         
 
        
-        bash verl/recipe/l2s/deepseek_qwen7B.sh    
+        bash verl/recipe/l2s/qwen3_4B_stage1.sh   
         break
     else
         echo "GPU $GPU_ID 当前显存 ${USED_MEM} MiB，大于等于阈值 ${THRESHOLD} MiB，等待中..."

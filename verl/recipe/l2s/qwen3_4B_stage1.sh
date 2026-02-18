@@ -6,7 +6,7 @@ export CUDA_VISIBLE_DEVICES="4,5,6,7"
 set -xeuo pipefail
 
 project_name='DAPO'
-exp_name='DAPO-Qwen3-4B'
+exp_name='DAPO-Qwen3-4B-stage1-4096'
 
 adv_estimator=grpo
 adv_isreward=True
@@ -31,7 +31,7 @@ train_prompt_bsz=64
 train_prompt_mini_bsz=16
 train_prompt_micro_bsz=4
 n_resp_per_prompt=8
-total_training_steps=200
+total_training_steps=400
 
 # Ray
 # RAY_ADDRESS=${RAY_ADDRESS:-"http://localhost:8265"}

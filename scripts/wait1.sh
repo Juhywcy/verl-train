@@ -28,7 +28,7 @@ while true; do
 
        
         # bash verl/recipe/l2s/qwen3_4B.sh   
-        bash scripts/eval_0.sh /home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage2-16384/global_step_380/actor_hf
+        bash scripts/eval0.sh /home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage2-16384/global_step_380/actor_hf
         bash scripts/eval.sh /home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage1-4096/global_step_400/actor_hf
         break
     else

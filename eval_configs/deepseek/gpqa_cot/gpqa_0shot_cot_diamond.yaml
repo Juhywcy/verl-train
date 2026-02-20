@@ -1,4 +1,4 @@
-dataset_path: Idavidrein/gpqa
+dataset_path: /home/dataset/Idavidrein/gpqa
 tag: gpqa
 dataset_name: gpqa_diamond
 task: gpqa_diamond

@@ -4,7 +4,7 @@ export CUDA_VISIBLE_DEVICES="4,5,6,7"
 export VLLM_USE_V1=0
 N_GPUS=4
 DATA_PARALLEL_SIZE=${N_GPUS}
-GPU_MEMORY_UTILIZATION=0.95
+GPU_MEMORY_UTILIZATION=0.7
 MODEL_PATH="${1:-ckpts/DAPO/DAPO-deepseek-Qwen1.5B/global_step_550/actor_hf}"
 last_dir=$(basename "${MODEL_PATH}")
 

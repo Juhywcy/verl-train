@@ -23,7 +23,7 @@ fi
 output_path="${MODEL_PATH}/eval"
 for seed in 0
 do 
-    lm_eval --model vllm --model_args pretrained=${MODEL_PATH},tensor_parallel_size=1,dtype=auto,gpu_memory_utilization=${GPU_MEMORY_UTILIZATION},data_parallel_size=${DATA_PARALLEL_SIZE},seed=${seed} --tasks commonsense_qa,arc_challenge,truthfulqa_mc2,winogrande  --batch_size auto --output_path ${output_path} --seed ${seed} --log_samples --apply_chat_template
+    lm_eval --model vllm --model_args pretrained=${MODEL_PATH},tensor_parallel_size=1,dtype=auto,gpu_memory_utilization=${GPU_MEMORY_UTILIZATION},data_parallel_size=${DATA_PARALLEL_SIZE},seed=${seed} --tasks gpqa_diamond  --batch_size auto --output_path ${output_path} --seed ${seed} --log_samples --apply_chat_template --include_path eval_configs/deepseek
     # lm_eval --model vllm --model_args pretrained=${MODEL_PATH},tensor_parallel_size=1,dtype=auto,gpu_memory_utilization=${GPU_MEMORY_UTILIZATION},data_parallel_size=${DATA_PARALLEL_SIZE},seed=${seed} --tasks aime --batch_size auto --output_path ${output_path} --include_path eval_configs/deepseek --seed ${seed} --log_samples --apply_chat_template
     # lm_eval --model vllm --model_args pretrained=${MODEL_PATH},tensor_parallel_size=1,dtype=auto,gpu_memory_utilization=${GPU_MEMORY_UTILIZATION},data_parallel_size=${DATA_PARALLEL_SIZE},seed=${seed} --tasks math_500,gsm8k_reasoning,minerva_algebra --batch_size auto --output_path ${output_path} --include_path eval_configs/deepseek --seed ${seed} --log_samples --apply_chat_template
 done 

@@ -27,7 +27,14 @@ while true; do
         
 
        
-        bash verl/recipe/l2s/qwen3_4B_stage1.sh   
+        # bash verl/recipe/l2s/qwen3_4B_stage1.sh   
+        bash  scripts/eval_qa.sh /home/models/Qwen/Qwen3-4B
+        bash  scripts/eval_qa.sh /home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage2-16384/global_step_380/actor_hf
+        bash  scripts/eval_qa.sh /home/verl-train/ckpts/DAPO/DAPO-deepseek-Qwen7B/global_step_400/actor_hf
+        bash  scripts/eval_qa.sh /home/models/nvidia/DLER-R1-1.5B-Research
+        bash  scripts/eval_qa.sh /home/models/nvidia/DLER-R1-7B-Research
+        bash  scripts/eval_qa.sh /home/models/zhangyx/TokenSqueeze-1.5B
+        bash  scripts/eval_qa.sh /home/models/zhangyx/TokenSqueeze-7B
         break
     else
         echo "GPU $GPU_ID 当前显存 ${USED_MEM} MiB，大于等于阈值 ${THRESHOLD} MiB，等待中..."

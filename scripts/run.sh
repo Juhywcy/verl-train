@@ -27,13 +27,23 @@ while true; do
         
 
        
-        bash  scripts/eval0.sh /home/models/Qwen/Qwen3-4B
-        bash  scripts/eval0.sh /home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage2-16384/global_step_380/actor_hf
-        bash  scripts/eval0.sh /home/verl-train/ckpts/DAPO/DAPO-deepseek-Qwen7B/global_step_400/actor_hf
-        bash  scripts/eval0.sh /home/models/nvidia/DLER-R1-1.5B-Research
-        bash  scripts/eval0.sh /home/models/nvidia/DLER-R1-7B-Research
-        bash  scripts/eval0.sh /home/models/zhangyx/TokenSqueeze-1.5B
-        bash  scripts/eval0.sh /home/models/zhangyx/TokenSqueeze-7B
+        # bash  scripts/eval0.sh /home/models/Qwen/Qwen3-4B
+        # bash  scripts/eval0.sh /home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage2-16384/global_step_380/actor_hf
+        # bash  scripts/eval0.sh /home/verl-train/ckpts/DAPO/DAPO-deepseek-Qwen7B/global_step_400/actor_hf
+        # bash  scripts/eval0.sh /home/models/nvidia/DLER-R1-1.5B-Research
+        # bash  scripts/eval0.sh /home/models/nvidia/DLER-R1-7B-Research
+        # bash  scripts/eval0.sh /home/models/zhangyx/TokenSqueeze-1.5B
+        # bash  scripts/eval0.sh /home/models/zhangyx/TokenSqueeze-7B
+        
+        
+        python scripts/eval/eval_excel_paths.py evaluation_metrics.xlsx \
+            /home/models/Qwen/Qwen3-4B \
+            /home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage2-16384/global_step_380/actor_hf \
+            /home/verl-train/ckpts/DAPO/DAPO-deepseek-Qwen7B/global_step_400/actor_hf \
+            /home/models/nvidia/DLER-R1-1.5B-Research \
+            /home/models/nvidia/DLER-R1-7B-Research \
+            /home/models/zhangyx/TokenSqueeze-1.5B \
+            /home/models/zhangyx/TokenSqueeze-7B
         
         
         break

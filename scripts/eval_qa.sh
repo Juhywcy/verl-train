@@ -28,5 +28,5 @@ do
     # lm_eval --model vllm --model_args pretrained=${MODEL_PATH},tensor_parallel_size=1,dtype=auto,gpu_memory_utilization=${GPU_MEMORY_UTILIZATION},data_parallel_size=${DATA_PARALLEL_SIZE},seed=${seed} --tasks math_500,gsm8k_reasoning,minerva_algebra --batch_size auto --output_path ${output_path} --include_path eval_configs/deepseek --seed ${seed} --log_samples --apply_chat_template
 done 
 
-bash scripts/eval/eval_all.sh ${MODEL_PATH} ${output_path}
+# bash scripts/eval/eval_all.sh ${MODEL_PATH} ${output_path}
 exit 0

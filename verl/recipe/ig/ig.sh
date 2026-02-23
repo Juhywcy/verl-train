@@ -36,8 +36,8 @@ grpo_weight_eps=1e-6
 grpo_weight_correct_threshold=0.5
 
 train_prompt_bsz=64
-train_prompt_mini_bsz=8
-train_prompt_micro_bsz=1 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
+train_prompt_mini_bsz=16
+train_prompt_micro_bsz=4 # per fwd batch size. if response_length=8192, use 4; 4096, use 8.
 n_resp_per_prompt=8
 total_training_steps=200
 
@@ -52,7 +52,7 @@ RAY_DATA_HOME=${RAY_DATA_HOME:-"${HOME}"}
 # very important! please modify the max_position_embeddings in config.json to 32768 after downloading from huggingface
 # MODEL_PATH=${MODEL_PATH:-"${RAY_DATA_HOME}/model/DeepSeek-R1-Distill-Qwen-1.5B"}
 WORKING_DIR=${WORKING_DIR:-"${PWD}"}
-MODEL_PATH=${MODEL_PATH:-"${RAY_DATA_HOME}/models/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"}
+MODEL_PATH=${MODEL_PATH:-"/home/models/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"}
 CKPTS_DIR=${CKPTS_DIR:-"${WORKING_DIR}/ckpts/${project_name}/${exp_name}"}
 # TRAIN_FILE=${TRAIN_FILE:-"${RAY_DATA_HOME}/dataset/DAPO-Math-17k/data/dapo-math-17k.parquet"}
 # TEST_FILE=${TEST_FILE:-"${RAY_DATA_HOME}/dataset/DAPO-AIME-2024/data/aime-2024.parquet"}
@@ -152,7 +152,7 @@ python3 -m verl.trainer.l2s_stage2_ig \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=10 \
-    trainer.save_freq=${total_training_steps} \
+    trainer.save_freq=20 \
     trainer.total_epochs=10 \
     trainer.total_training_steps=${total_training_steps} \
     trainer.default_local_dir="${CKPTS_DIR}" \

@@ -28,7 +28,10 @@ while true; do
 
        
         # bash verl/recipe/l2s/qwen3_4B_stage1.sh   
-       bash  verl/recipe/ig/ig.sh
+        # bash  verl/recipe/ig/ig.sh
+        bash scripts/eval.sh ckpts/IG/IG-deepseek-Qwen1.5B/global_step_200/actor_hf
+        bash scripts/eval.sh ckpts/IG/grpo-deepseek-Qwen1.5B/global_step_200/actor_hf
+
         break
     else
         echo "GPU $GPU_ID 当前显存 ${USED_MEM} MiB，大于等于阈值 ${THRESHOLD} MiB，等待中..."

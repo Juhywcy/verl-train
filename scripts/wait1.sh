@@ -29,7 +29,7 @@ while true; do
        
         # bash verl/recipe/l2s/qwen3_4B.sh   
         # bash scripts/eval0.sh /home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage2-16384/global_step_380/actor_hf
-       bash verl/recipe/ig/grpo.sh
+       bash verl/recipe/l2s/qwen3_4B_stage1.sh
        break
     else
         echo "GPU $GPU_ID 当前显存 ${USED_MEM} MiB，大于等于阈值 ${THRESHOLD} MiB，等待中..."

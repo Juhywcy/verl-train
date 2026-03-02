@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# export CUDA_VISIBLE_DEVICES="0,1,2,3" 
-export CUDA_VISIBLE_DEVICES="4,5,6,7" 
+export CUDA_VISIBLE_DEVICES="0,1,2,3" 
+# export CUDA_VISIBLE_DEVICES="4,5,6,7" 
 # export CUDA_VISIBLE_DEVICES="4,5"
 # export RAY_DEBUG_POST_MORTEM=1
 set -xeuo pipefail
 
 project_name='DAPO'
-exp_name='DAPO-Qwen3-4B-stage1-4096'
+exp_name='DAPO-Qwen3-4B-stage1-6120'
 
 adv_estimator=grpo
 adv_isreward=True
@@ -20,9 +20,9 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 1))
-max_response_length=$((1024 * 4))
+max_response_length=$((1024 * 6))
 enable_overlong_buffer=False
-overlong_buffer_len=$((1024 * 4))
+overlong_buffer_len=$((1024 * 6))
 overlong_penalty_factor=1.0
 
 loss_agg_mode="token-mean"
@@ -105,7 +105,7 @@ python3 -m verl.trainer.l2s \
     actor_rollout_ref.actor.grad_clip=1.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     actor_rollout_ref.actor.ulysses_sequence_parallel_size=${sp_size} \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.7 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.65 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.enable_chunked_prefill=True \
     actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length + max_response_length)) \
@@ -132,8 +132,8 @@ python3 -m verl.trainer.l2s \
     trainer.n_gpus_per_node="${NGPUS_PER_NODE}" \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
-    trainer.test_freq=50 \
-    trainer.save_freq=50 \
+    trainer.test_freq=20 \
+    trainer.save_freq=20 \
     trainer.total_epochs=10 \
     trainer.total_training_steps=${total_training_steps} \
     trainer.default_local_dir="${CKPTS_DIR}" \

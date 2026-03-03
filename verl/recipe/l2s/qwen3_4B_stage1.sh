@@ -29,7 +29,7 @@ loss_agg_mode="token-mean"
 
 train_prompt_bsz=64
 train_prompt_mini_bsz=16
-train_prompt_micro_bsz=4
+train_prompt_micro_bsz=2
 n_resp_per_prompt=8
 total_training_steps=400
 

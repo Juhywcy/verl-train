@@ -29,12 +29,12 @@ while true; do
        
         # bash verl/recipe/l2s/qwen3_4B.sh   
         # bash scripts/eval0.sh /home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage2-16384/global_step_380/actor_hf
-    #    bash verl/recipe/l2s/qwen3_4B_stage1.sh
+        bash verl/recipe/l2s/qwen3_4B_stage1.sh
 
-        for ((step=20; step<=400; step+=20)); do
-            echo "Starting eval for global_step_${step}..."
-            bash scripts/eval.sh /home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage1-6120/global_step_${step}/actor
-        done
+        # for ((step=20; step<=400; step+=20)); do
+        #     echo "Starting eval for global_step_${step}..."
+        #     bash scripts/eval.sh /home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage1-6120/global_step_${step}/actor
+        # done
         
        break
     else

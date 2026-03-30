@@ -6,8 +6,8 @@ OUTPUT_EXCEL="stage1_results.xlsx"
 
 # 构建不同 step 下的 model path 数组
 PATHS=()
-for ((step=20; step<=400; step+=20)); do
-    PATHS+=("/home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage1-6120/global_step_${step}/actor_hf")
+for ((step=20; step<=200; step+=20)); do
+    PATHS+=("/home/verl-train/ckpts/DAPO/DAPO-Qwen3-4B-stage1-4096/global_step_${step}/actor_hf")
 done
 
 # 运行 eval_excel_paths.py 把各个路径传过去

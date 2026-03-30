@@ -6,7 +6,7 @@ export CUDA_VISIBLE_DEVICES="0,1,2,3"
 set -xeuo pipefail
 
 project_name='DAPO'
-exp_name='DAPO-Qwen3-4B-stage1-4096'
+exp_name='DAPO-Qwen3-4B-stage1-3072'
 
 adv_estimator=grpo
 adv_isreward=True
@@ -20,9 +20,9 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 1))
-max_response_length=$((1024 * 4))
+max_response_length=$((1024 * 3))
 enable_overlong_buffer=False
-overlong_buffer_len=$((1024 * 4))
+overlong_buffer_len=$((1024 * 3))
 overlong_penalty_factor=1.0
 
 loss_agg_mode="token-mean"
